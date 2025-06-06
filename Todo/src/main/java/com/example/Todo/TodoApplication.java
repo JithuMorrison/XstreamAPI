@@ -47,9 +47,9 @@ public class TodoApplication {
 	}
 
 	@PostMapping("/addTask")
-	public Task addTask(@RequestBody Task task) {
+	public String addTask(@RequestBody Task task) {
 		task.setId(null);
-		return taskRepo.save(task);
+		return taskRepo.save(task).getId();
 	}
 
 	@PutMapping("/update/{id}")
@@ -77,4 +77,11 @@ public class TodoApplication {
 		Optional<User> user = userRepo.findByUsername(param);
 		return user.map(u -> u.getPassword().equals(password)).orElse(false);
 	}
+
+	@PostMapping("/addUser")
+	public String addUser(@RequestBody User user) {
+		user.setId(null);
+		return userRepo.save(user).getId();
+	}
+
 }

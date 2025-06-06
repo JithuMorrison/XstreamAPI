@@ -48,6 +48,7 @@ public class TodoApplication {
 
 	@PostMapping("/addTask")
 	public Task addTask(@RequestBody Task task) {
+		task.setId(null);
 		return taskRepo.save(task);
 	}
 

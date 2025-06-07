@@ -84,7 +84,7 @@ public class TodoApplication {
 		project.setStatus("Started");
 		project.setTasks(new ArrayList<>());
 		String id = projectRepo.save(project).getId();
-		userRepo.findById((String) entity.get("userid")).ifPresent(user -> {
+		userRepo.findById(entity.get("userid")).ifPresent(user -> {
 			List<String> projects = user.getProjects();
 			if (projects == null) {
 				projects = new ArrayList<>();
@@ -110,11 +110,7 @@ public class TodoApplication {
 
 	@GetMapping("/getProject")
 	public List<Project> getProject(@RequestParam List<String> id) {
-		List<Project> projects = new ArrayList<>();
-		for (String projectId : id) {
-			projectRepo.findById(projectId).ifPresent(projects::add);
-		}
-		return projects;
+		return projectRepo.findAllById(id);
 	}
 
 	@PostMapping("/login")

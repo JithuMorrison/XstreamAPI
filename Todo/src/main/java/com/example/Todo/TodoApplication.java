@@ -71,12 +71,21 @@ public class TodoApplication {
 	}
 
 	@PostMapping("/login")
-	public boolean login(@RequestBody Map<String, String> body) {
+	public Map<String, Object> login(@RequestBody Map<String, String> body) {
 		String param = body.get("param");
 		String password = body.get("password");
 
-		Optional<User> user = userRepo.findByUsername(param);
-		return user.map(u -> u.getPassword().equals(password)).orElse(false);
+		Map<String, Object> response = new HashMap<>();
+		Optional<User> user = userRepo.findByEmail(param);
+
+		if (user.isPresent() && user.get().getPassword().equals(password)) {
+			response.put("success", true);
+			response.put("id", user.get().getId());
+		} else {
+			response.put("success", false);
+			response.put("id", null);
+		}
+		return response;
 	}
 
 	@PostMapping("/register")

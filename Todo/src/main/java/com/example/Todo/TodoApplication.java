@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,7 +54,7 @@ public class TodoApplication {
 	}
 
 	@PutMapping("/update/{id}")
-	public Task putMethodName(@PathVariable String id, @RequestBody Task entity) {
+	public Task updatetask(@PathVariable String id, @RequestBody Task entity) {
 		return taskRepo.findById(id).map(task -> {
 			task.setName(entity.getName());
 			task.setDescription(entity.getDescription());
@@ -78,10 +79,32 @@ public class TodoApplication {
 		return user.map(u -> u.getPassword().equals(password)).orElse(false);
 	}
 
-	@PostMapping("/addUser")
-	public String addUser(@RequestBody User user) {
+	@PostMapping("/register")
+	public User addUser(@RequestBody User user) {
 		user.setId(null);
-		return userRepo.save(user).getId();
+		userRepo.save(user);
+		return user;
+	}
+
+	@GetMapping("/getUser")
+	public Boolean getUser(@RequestParam String email) {
+		return userRepo.findByEmail(email).isPresent();
+	}
+
+	@PutMapping("/updateUser/{id}")
+	public String updateuser(@PathVariable String id, @RequestBody User entity) {
+		return userRepo.findById(id).map(user -> {
+			user.setUsername(entity.getUsername());
+			user.setPassword(entity.getPassword());
+			user.setEmail(entity.getEmail());
+			user.setRole(entity.getRole());
+			user.setFname(entity.getFname());
+			user.setLname(entity.getLname());
+			user.setPhoneno(entity.getPhoneno());
+			user.setAddress(entity.getAddress());
+			userRepo.save(user);
+			return "User updated successfully";
+		}).orElse("User not found");
 	}
 
 }

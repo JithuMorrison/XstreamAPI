@@ -123,10 +123,10 @@ public class TodoApplication {
 
 		if (user.isPresent() && user.get().getPassword().equals(password)) {
 			response.put("success", true);
-			response.put("id", user.get().getId());
+			response.put("user", user.get()); // return full user object
 		} else {
 			response.put("success", false);
-			response.put("id", null);
+			response.put("user", null);
 		}
 		return response;
 	}

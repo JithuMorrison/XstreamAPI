@@ -102,9 +102,16 @@ public class TodoApplication {
 			user.setLname(entity.getLname());
 			user.setPhoneno(entity.getPhoneno());
 			user.setAddress(entity.getAddress());
+			user.setProjects(entity.getProjects());
 			userRepo.save(user);
 			return "User updated successfully";
 		}).orElse("User not found");
+	}
+
+	@DeleteMapping("/deleteUser/{id}")
+	public String deleteUser(@PathVariable String id) {
+		userRepo.deleteById(id);
+		return "User deleted successfully";
 	}
 
 }

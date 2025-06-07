@@ -76,20 +76,13 @@ public class TodoApplication {
 	}
 
 	@PostMapping("/addProject")
-	public String addProject(@RequestBody Map<String, Object> entity) {
+	public String addProject(@RequestBody Map<String, String> entity) {
 		Project project = new Project();
 		project.setId(null);
-		project.setName((String) entity.get("name"));
-		project.setDescription((String) entity.get("description"));
-		Object tasksObj = entity.get("tasks");
-		List<String> taskIds = new ArrayList<>();
-		if (tasksObj instanceof List<?>) {
-			for (Object item : (List<?>) tasksObj) {
-				if (item instanceof String) {
-					taskIds.add((String) item);
-				}
-			}
-		}
+		project.setName(entity.get("name"));
+		project.setDescription(entity.get("description"));
+		project.setStatus("Started");
+		project.setTasks(new ArrayList<>());
 		String id = projectRepo.save(project).getId();
 		userRepo.findById((String) entity.get("userid")).ifPresent(user -> {
 			List<String> projects = user.getProjects();
@@ -101,6 +94,27 @@ public class TodoApplication {
 			userRepo.save(user);
 		});
 		return id;
+	}
+
+	@PutMapping("/updateProject")
+	public Project updateProject(@RequestBody Project entity) {
+		return projectRepo.findById(entity.getId()).map(project -> {
+			project.setName(entity.getName());
+			project.setDescription(entity.getDescription());
+			project.setStatus(entity.getStatus());
+			project.setTasks(entity.getTasks());
+			projectRepo.save(project);
+			return project;
+		}).orElse(null);
+	}
+
+	@GetMapping("/getProject")
+	public List<Project> getProject(@RequestParam List<String> id) {
+		List<Project> projects = new ArrayList<>();
+		for (String projectId : id) {
+			projectRepo.findById(projectId).ifPresent(projects::add);
+		}
+		return projects;
 	}
 
 	@PostMapping("/login")

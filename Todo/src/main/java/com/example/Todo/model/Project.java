@@ -12,6 +12,7 @@ public class Project {
     private String id;
     private String name;
     private String description;
+    private String status;
     private List<String> tasks;
 
     public Project() {
@@ -52,6 +53,14 @@ public class Project {
 
     public void setTasks(List<String> tasks) {
         this.tasks = tasks;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

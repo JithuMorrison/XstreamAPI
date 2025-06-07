@@ -14,8 +14,10 @@ import java.util.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.Todo.repo.ProjectRepo;
 import com.example.Todo.repo.TaskRepo;
 import com.example.Todo.repo.UserRepo;
+import com.example.Todo.model.Project;
 import com.example.Todo.model.Task;
 import com.example.Todo.model.User;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,6 +34,9 @@ public class TodoApplication {
 
 	@Autowired
 	private UserRepo userRepo;
+
+	@Autowired
+	private ProjectRepo projectRepo;
 
 	public static void main(String[] args) {
 		SpringApplication.run(TodoApplication.class, args);
@@ -68,6 +73,34 @@ public class TodoApplication {
 	public Task deleteTask(@PathVariable String id) {
 		taskRepo.deleteById(id);
 		return new Task();
+	}
+
+	@PostMapping("/addProject")
+	public String addProject(@RequestBody Map<String, Object> entity) {
+		Project project = new Project();
+		project.setId(null);
+		project.setName((String) entity.get("name"));
+		project.setDescription((String) entity.get("description"));
+		Object tasksObj = entity.get("tasks");
+		List<String> taskIds = new ArrayList<>();
+		if (tasksObj instanceof List<?>) {
+			for (Object item : (List<?>) tasksObj) {
+				if (item instanceof String) {
+					taskIds.add((String) item);
+				}
+			}
+		}
+		String id = projectRepo.save(project).getId();
+		userRepo.findById((String) entity.get("userid")).ifPresent(user -> {
+			List<String> projects = user.getProjects();
+			if (projects == null) {
+				projects = new ArrayList<>();
+			}
+			projects.add(id);
+			user.setProjects(projects);
+			userRepo.save(user);
+		});
+		return id;
 	}
 
 	@PostMapping("/login")

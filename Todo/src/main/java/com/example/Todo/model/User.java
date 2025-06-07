@@ -2,7 +2,6 @@ package com.example.Todo.model;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,7 +17,7 @@ public class User {
     private String fname;
     private String lname;
     private String address;
-    private List<ObjectId> projects;
+    private List<String> projects;
 
     public User() {
     }
@@ -52,11 +51,11 @@ public class User {
         this.password = password;
     }
 
-    public List<ObjectId> getProjects() {
+    public List<String> getProjects() {
         return projects;
     }
 
-    public void setProjects(List<ObjectId> projects) {
+    public void setProjects(List<String> projects) {
         this.projects = projects;
     }
 

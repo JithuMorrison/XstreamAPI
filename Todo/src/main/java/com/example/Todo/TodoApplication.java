@@ -83,6 +83,8 @@ public class TodoApplication {
 		project.setDescription(entity.get("description"));
 		project.setStatus("Started");
 		project.setTasks(new ArrayList<>());
+		project.setMembers(new ArrayList<>());
+		project.getMembers().add(entity.get("userid"));
 		String id = projectRepo.save(project).getId();
 		userRepo.findById(entity.get("userid")).ifPresent(user -> {
 			List<String> projects = user.getProjects();
@@ -103,6 +105,7 @@ public class TodoApplication {
 			project.setDescription(entity.getDescription());
 			project.setStatus(entity.getStatus());
 			project.setTasks(entity.getTasks());
+			project.setMembers(entity.getMembers());
 			projectRepo.save(project);
 			return project;
 		}).orElse(null);
@@ -111,6 +114,22 @@ public class TodoApplication {
 	@GetMapping("/getProject")
 	public List<Project> getProject(@RequestParam List<String> id) {
 		return projectRepo.findAllById(id);
+	}
+
+	@DeleteMapping("/deleteProject/{id}")
+	public String deleteProject(@PathVariable String id) {
+		List<String> memberIds = projectRepo.findById(id)
+				.map(Project::getMembers)
+				.orElse(Collections.emptyList());
+		userRepo.findAllById(memberIds).forEach(user -> {
+			List<String> projects = user.getProjects();
+			if (projects != null && projects.remove(id)) {
+				user.setProjects(projects);
+				userRepo.save(user);
+			}
+		});
+		projectRepo.deleteById(id);
+		return "Project deleted successfully";
 	}
 
 	@PostMapping("/login")

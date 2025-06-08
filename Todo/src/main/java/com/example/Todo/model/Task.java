@@ -11,6 +11,7 @@ public class Task {
     private String name;
     private String description;
     private String status;
+    private String projectId;
 
     public Task() {
     }
@@ -51,5 +52,13 @@ public class Task {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 }

@@ -14,6 +14,7 @@ public class Project {
     private String description;
     private String status;
     private List<String> tasks;
+    private List<String> members;
 
     public Project() {
     }
@@ -61,6 +62,14 @@ public class Project {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<String> members) {
+        this.members = members;
     }
 
 }

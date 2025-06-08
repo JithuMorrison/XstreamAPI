@@ -55,7 +55,17 @@ public class TodoApplication {
 	@PostMapping("/addTask")
 	public String addTask(@RequestBody Task task) {
 		task.setId(null);
-		return taskRepo.save(task).getId();
+		String id = taskRepo.save(task).getId();
+		projectRepo.findById(task.getProjectId()).ifPresent(proj -> {
+			List<String> tasks = proj.getTasks();
+			if (tasks == null) {
+				tasks = new ArrayList<>();
+			}
+			tasks.add(id);
+			proj.setTasks(tasks);
+			projectRepo.save(proj);
+		});
+		return id;
 	}
 
 	@PutMapping("/update/{id}")
@@ -71,6 +81,16 @@ public class TodoApplication {
 
 	@DeleteMapping("/delete/{id}")
 	public Task deleteTask(@PathVariable String id) {
+		String ProjectId = taskRepo.findById(id)
+				.map(Task::getProjectId)
+				.orElse("");
+		Optional<Project> project = projectRepo.findById(ProjectId);
+		Project proj = project.get();
+		List<String> projects = proj.getTasks();
+		if (projects != null && projects.remove(id)) {
+			proj.setTasks(projects);
+			projectRepo.save(proj);
+		}
 		taskRepo.deleteById(id);
 		return new Task();
 	}

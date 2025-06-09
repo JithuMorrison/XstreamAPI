@@ -48,8 +48,8 @@ public class TodoApplication {
 	}
 
 	@GetMapping("/hello")
-	public List<Task> getTasks() {
-		return taskRepo.findAll();
+	public List<Task> getTasks(@RequestParam List<String> ids) {
+		return taskRepo.findAllById(ids);
 	}
 
 	@PostMapping("/addTask")
@@ -186,7 +186,6 @@ public class TodoApplication {
 	public String updateuser(@PathVariable String id, @RequestBody User entity) {
 		return userRepo.findById(id).map(user -> {
 			user.setUsername(entity.getUsername());
-			user.setPassword(entity.getPassword());
 			user.setEmail(entity.getEmail());
 			user.setRole(entity.getRole());
 			user.setFname(entity.getFname());

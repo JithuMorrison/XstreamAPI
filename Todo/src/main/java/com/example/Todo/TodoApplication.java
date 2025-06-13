@@ -148,6 +148,7 @@ public class TodoApplication {
 				userRepo.save(user);
 			}
 		});
+		taskRepo.deleteByProjectId(id);
 		projectRepo.deleteById(id);
 		return "Project deleted successfully";
 	}

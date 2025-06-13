@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -207,6 +209,14 @@ public class TodoApplication {
 	@GetMapping("/getUser")
 	public Boolean getUser(@RequestParam String email) {
 		return userRepo.findByEmail(email).isPresent();
+	}
+
+	@PostMapping("/getUsernames")
+	public List<String> getUsernames(@RequestBody List<String> userIds) {
+		return userRepo.findAllById(userIds)
+				.stream()
+				.map(User::getUsername)
+				.collect(Collectors.toList());
 	}
 
 	@PutMapping("/updateUser/{id}")

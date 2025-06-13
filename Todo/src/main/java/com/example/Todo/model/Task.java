@@ -12,6 +12,7 @@ public class Task {
     private String description;
     private String status;
     private String projectId;
+    private String memberAssigned;
 
     public Task() {
     }
@@ -60,5 +61,13 @@ public class Task {
 
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public String getMemberAssigned() {
+        return memberAssigned;
+    }
+
+    public void setMemberAssigned(String memberAssigned) {
+        this.memberAssigned = memberAssigned;
     }
 }

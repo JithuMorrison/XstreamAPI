@@ -79,6 +79,32 @@ public class TodoApplication {
 		}).orElse(entity);
 	}
 
+	@PutMapping("/assignTask/{userId}")
+	public User assignTaskToUser(@PathVariable String userId, @RequestBody Map<String, String> request) {
+		String taskId = request.get("taskId");
+		String projectId = request.get("projectId");
+
+		// Update user
+		User updatedUser = userRepo.findById(userId).map(user -> {
+			Map<String, List<String>> assignedTasks = user.getAssignedTasks();
+			if (assignedTasks == null) {
+				assignedTasks = new HashMap<>();
+			}
+
+			assignedTasks.computeIfAbsent(projectId, k -> new ArrayList<>()).add(taskId);
+			user.setAssignedTasks(assignedTasks);
+			return userRepo.save(user);
+		}).orElse(null);
+
+		// Update task with assigned member
+		taskRepo.findById(taskId).ifPresent(task -> {
+			task.setMemberAssigned(userId);
+			taskRepo.save(task);
+		});
+
+		return updatedUser;
+	}
+
 	@DeleteMapping("/delete/{id}")
 	public Task deleteTask(@PathVariable String id) {
 		String ProjectId = taskRepo.findById(id)

@@ -1,6 +1,7 @@
 package com.example.Todo.model;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +20,7 @@ public class User {
     private String lname;
     private String address;
     private List<String> projects;
+    private Map<String, List<String>> assignedTasks;
 
     public User() {
     }
@@ -114,5 +116,13 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Map<String, List<String>> getAssignedTasks() {
+        return assignedTasks;
+    }
+
+    public void setAssignedTasks(Map<String, List<String>> assignedTasks) {
+        this.assignedTasks = assignedTasks;
     }
 }

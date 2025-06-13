@@ -198,6 +198,15 @@ public class TodoApplication {
 		}).orElse("User not found");
 	}
 
+	@PutMapping("/updateStatus/{id}")
+	public String updateUserStatus(@PathVariable String id, @RequestBody User entity) {
+		return userRepo.findById(id).map(user -> {
+			user.setStatus(entity.getStatus());
+			userRepo.save(user);
+			return "User status updated successfully";
+		}).orElse("User not found");
+	}
+
 	@DeleteMapping("/deleteUser/{id}")
 	public String deleteUser(@PathVariable String id) {
 		userRepo.deleteById(id);

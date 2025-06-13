@@ -12,7 +12,8 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private String role;
+    private List<String> role;
+    private String status;
     private String phoneNumber;
     private String fname;
     private String lname;
@@ -67,11 +68,11 @@ public class User {
         this.email = email;
     }
 
-    public String getRole() {
+    public List<String> getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(List<String> role) {
         this.role = role;
     }
 
@@ -105,5 +106,13 @@ public class User {
 
     public void setAddress(String add) {
         this.address = add;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

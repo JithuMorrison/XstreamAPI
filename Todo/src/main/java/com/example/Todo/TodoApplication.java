@@ -41,6 +41,9 @@ public class TodoApplication {
 	@Autowired
 	private ProjectRepo projectRepo;
 
+	@Autowired
+	private DigiPinService service;
+
 	public static void main(String[] args) {
 		SpringApplication.run(TodoApplication.class, args);
 	}
@@ -277,7 +280,6 @@ public class TodoApplication {
 			}
 		});
 
-		// Return the full updated project
 		return projectRepo.findById(projectId)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
@@ -312,6 +314,20 @@ public class TodoApplication {
 	public String deleteUser(@PathVariable String id) {
 		userRepo.deleteById(id);
 		return "User deleted successfully";
+	}
+
+	@PostMapping("/encode")
+	public Map<String, String> encode(@RequestBody Map<String, Double> payload) {
+		double lat = payload.get("lat");
+		double lon = payload.get("lon");
+		return Map.of("digipin", service.encode(lat, lon));
+	}
+
+	@PostMapping("/decode")
+	public Map<String, Double> decode(@RequestBody Map<String, String> payload) {
+		String pin = payload.get("digipin");
+		double[] result = service.decode(pin);
+		return Map.of("latitude", result[0], "longitude", result[1]);
 	}
 
 }

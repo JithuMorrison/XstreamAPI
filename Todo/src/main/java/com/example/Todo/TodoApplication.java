@@ -3,6 +3,7 @@ package com.example.Todo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -125,6 +126,8 @@ public class TodoApplication {
 
 	@PostMapping("/addProject")
 	public String addProject(@RequestBody Map<String, String> entity) {
+		String userId = entity.get("userid");
+
 		Project project = new Project();
 		project.setId(null);
 		project.setName(entity.get("name"));
@@ -132,17 +135,26 @@ public class TodoApplication {
 		project.setStatus("Started");
 		project.setTasks(new ArrayList<>());
 		project.setMembers(new ArrayList<>());
-		project.getMembers().add(entity.get("userid"));
+		project.getMembers().add(userId);
+
 		String id = projectRepo.save(project).getId();
-		userRepo.findById(entity.get("userid")).ifPresent(user -> {
+
+		userRepo.findById(userId).ifPresent(user -> {
 			List<String> projects = user.getProjects();
-			if (projects == null) {
+			if (projects == null)
 				projects = new ArrayList<>();
-			}
 			projects.add(id);
 			user.setProjects(projects);
+
+			List<String> roles = user.getRole();
+			if (roles == null)
+				roles = new ArrayList<>();
+			roles.add("creator");
+			user.setRole(roles);
+
 			userRepo.save(user);
 		});
+
 		return id;
 	}
 
@@ -169,13 +181,25 @@ public class TodoApplication {
 		List<String> memberIds = projectRepo.findById(id)
 				.map(Project::getMembers)
 				.orElse(Collections.emptyList());
+
 		userRepo.findAllById(memberIds).forEach(user -> {
 			List<String> projects = user.getProjects();
-			if (projects != null && projects.remove(id)) {
-				user.setProjects(projects);
-				userRepo.save(user);
+			List<String> roles = user.getRole();
+
+			if (projects != null && roles != null) {
+				int index = projects.indexOf(id);
+				if (index != -1) {
+					projects.remove(index);
+					if (roles.size() > index) {
+						roles.remove(index);
+					}
+					user.setProjects(projects);
+					user.setRole(roles);
+					userRepo.save(user);
+				}
 			}
 		});
+
 		taskRepo.deleteByProjectId(id);
 		projectRepo.deleteById(id);
 		return "Project deleted successfully";
@@ -220,16 +244,14 @@ public class TodoApplication {
 	}
 
 	@PostMapping("/joinProject")
-	public String joinProject(@RequestBody Map<String, String> entity) {
+	public ResponseEntity<Project> joinProject(@RequestBody Map<String, String> entity) {
 		String userId = entity.get("userid");
 		String projectId = entity.get("projectid");
 
-		// Update project: add user to members
 		projectRepo.findById(projectId).ifPresent(project -> {
 			List<String> members = project.getMembers();
-			if (members == null) {
+			if (members == null)
 				members = new ArrayList<>();
-			}
 			if (!members.contains(userId)) {
 				members.add(userId);
 				project.setMembers(members);
@@ -237,20 +259,28 @@ public class TodoApplication {
 			}
 		});
 
-		// Update user: add project to user's projects
 		userRepo.findById(userId).ifPresent(user -> {
 			List<String> projects = user.getProjects();
-			if (projects == null) {
+			if (projects == null)
 				projects = new ArrayList<>();
-			}
 			if (!projects.contains(projectId)) {
 				projects.add(projectId);
 				user.setProjects(projects);
+
+				List<String> roles = user.getRole();
+				if (roles == null)
+					roles = new ArrayList<>();
+				roles.add("member");
+				user.setRole(roles);
+
 				userRepo.save(user);
 			}
 		});
 
-		return "User added to project successfully";
+		// Return the full updated project
+		return projectRepo.findById(projectId)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@PutMapping("/updateUser/{id}")

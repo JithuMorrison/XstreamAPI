@@ -219,6 +219,40 @@ public class TodoApplication {
 				.collect(Collectors.toList());
 	}
 
+	@PostMapping("/joinProject")
+	public String joinProject(@RequestBody Map<String, String> entity) {
+		String userId = entity.get("userid");
+		String projectId = entity.get("projectid");
+
+		// Update project: add user to members
+		projectRepo.findById(projectId).ifPresent(project -> {
+			List<String> members = project.getMembers();
+			if (members == null) {
+				members = new ArrayList<>();
+			}
+			if (!members.contains(userId)) {
+				members.add(userId);
+				project.setMembers(members);
+				projectRepo.save(project);
+			}
+		});
+
+		// Update user: add project to user's projects
+		userRepo.findById(userId).ifPresent(user -> {
+			List<String> projects = user.getProjects();
+			if (projects == null) {
+				projects = new ArrayList<>();
+			}
+			if (!projects.contains(projectId)) {
+				projects.add(projectId);
+				user.setProjects(projects);
+				userRepo.save(user);
+			}
+		});
+
+		return "User added to project successfully";
+	}
+
 	@PutMapping("/updateUser/{id}")
 	public String updateuser(@PathVariable String id, @RequestBody User entity) {
 		return userRepo.findById(id).map(user -> {

@@ -239,10 +239,15 @@ public class TodoApplication {
 	}
 
 	@PostMapping("/getUsernames")
-	public List<String> getUsernames(@RequestBody List<String> userIds) {
+	public List<Map<String, String>> getUsernames(@RequestBody List<String> userIds) {
 		return userRepo.findAllById(userIds)
 				.stream()
-				.map(User::getUsername)
+				.map(user -> {
+					Map<String, String> map = new HashMap<>();
+					map.put("username", user.getUsername());
+					map.put("status", user.getStatus());
+					return map;
+				})
 				.collect(Collectors.toList());
 	}
 

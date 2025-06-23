@@ -306,6 +306,15 @@ public class TodoApplication {
 		}).orElse("User not found");
 	}
 
+	@PutMapping("/updateUserpass/{email}")
+	public String updateuserpass(@PathVariable String email, @RequestBody String pass) {
+		return userRepo.findByEmail(email).map(user -> {
+			user.setPassword(pass);
+			userRepo.save(user);
+			return "Userpass updated successfully";
+		}).orElse("User not found");
+	}
+
 	@PutMapping("/updateStatus/{id}")
 	public String updateUserStatus(@PathVariable String id, @RequestBody User entity) {
 		return userRepo.findById(id).map(user -> {
